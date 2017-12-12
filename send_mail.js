@@ -31,9 +31,14 @@ const buildAWSTransporter = () => {
 
 const transporter = isTestEnvironment() ? buildEtherealTransporter() : buildAWSTransporter();
 
+const addTestUrl = (response) =>
+	Object.assign({}, response, { testUrl: nodemailer.getTestMessageUrl(response) });
+
+const decorateResponse = isTestEnvironment() ? addTestUrl : identity;
+
 const sendMail = (mailOptions) =>
 	transporter
 		.sendMail(mailOptions)
-		.then(isTestEnvironment() ? nodemailer.getTestMessageUrl : identity);
+		.then(decorateResponse);
 
 module.exports = sendMail;
